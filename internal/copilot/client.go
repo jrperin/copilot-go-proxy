@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	CopilotBaseIndividual  = "https://api.githubcopilot.com"
-	CopilotBaseBusiness    = "https://api.business.githubcopilot.com"
-	CopilotBaseEnterprise  = "https://api.enterprise.githubcopilot.com"
+	CopilotBaseIndividual = "https://api.githubcopilot.com"
+	CopilotBaseBusiness   = "https://api.business.githubcopilot.com"
+	CopilotBaseEnterprise = "https://api.enterprise.githubcopilot.com"
 )
 
 type Client struct {

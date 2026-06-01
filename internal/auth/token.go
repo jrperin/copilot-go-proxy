@@ -4,17 +4,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/jrperin/copilot-go-proxy/internal/config"
+)
+
+var (
+	copilotTokenURL = "https://api.github.com/copilot_internal/v2/token"
 )
 
 const (
-	copilotTokenURL = "https://api.github.com/copilot_internal/v2/token"
-	editorVersion   = "vscode/1.113.0"
-	pluginVersion   = "copilot-chat/0.26.7"
-	userAgent       = "GitHubCopilotChat/0.26.7"
-	apiVersion      = "2025-04-01"
+	editorVersion = "vscode/1.113.0"
+	pluginVersion = "copilot-chat/0.26.7"
+	userAgent     = "GitHubCopilotChat/0.26.7"
+	apiVersion    = "2025-04-01"
 )
 
 type TokenManager struct {
@@ -37,16 +43,24 @@ func (tm *TokenManager) GetToken() (string, error) {
 	defer tm.mu.Unlock()
 
 	if tm.copilotJWT == "" || time.Now().Unix() >= tm.expiresAt-60 {
+		slog.Info("copilot token is expired or empty, refreshing...")
 		if err := tm.refreshToken(); err != nil {
+			slog.Error("failed to refresh copilot token", "error", err)
 			return "", fmt.Errorf("refreshing copilot token: %w", err)
 		}
+		slog.Info("successfully refreshed copilot token")
 	}
 
 	return tm.copilotJWT, nil
 }
 
 func (tm *TokenManager) refreshToken() error {
-	req, err := http.NewRequest("GET", copilotTokenURL, nil)
+	url := copilotTokenURL
+	if config.AppConfig != nil && config.AppConfig.CopilotTokenURL != "" {
+		url = config.AppConfig.CopilotTokenURL
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return err
 	}
@@ -84,6 +98,8 @@ func (tm *TokenManager) refreshToken() error {
 
 	tm.copilotJWT = tokenResp.Token
 	tm.expiresAt = tokenResp.ExpiresAt
+
+	slog.Debug("token refreshed", "expires_at", time.Unix(tm.expiresAt, 0).Format(time.RFC3339))
 
 	return nil
 }

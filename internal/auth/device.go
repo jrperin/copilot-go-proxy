@@ -8,13 +8,12 @@ import (
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/jrperin/copilot-go-proxy/internal/config"
 )
 
 const (
-	githubClientID      = "Iv1.b507a08c87ecfe98"
-	githubDeviceCodeURL = "https://github.com/login/device/code"
-	githubAccessTokenURL = "https://github.com/login/oauth/access_token"
-	githubScopes        = "read:user"
+	githubScopes = "read:user"
 )
 
 type DeviceCodeInfo struct {
@@ -27,11 +26,11 @@ type DeviceCodeInfo struct {
 
 func RequestDeviceCode() (*DeviceCodeInfo, error) {
 	data := url.Values{
-		"client_id": {githubClientID},
+		"client_id": {config.AppConfig.GitHubClientID},
 		"scope":     {githubScopes},
 	}
 
-	req, err := http.NewRequest("POST", githubDeviceCodeURL, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", config.AppConfig.GitHubDeviceCodeURL, strings.NewReader(data.Encode()))
 	if err != nil {
 		return nil, fmt.Errorf("creating request: %w", err)
 	}
@@ -99,12 +98,12 @@ func PollForAccessToken(deviceCode string, interval int) (string, error) {
 
 func pollOnce(deviceCode string) (string, error) {
 	data := url.Values{
-		"client_id":  {githubClientID},
+		"client_id":   {config.AppConfig.GitHubClientID},
 		"device_code": {deviceCode},
 		"grant_type":  {"urn:ietf:params:oauth:grant-type:device_code"},
 	}
 
-	req, err := http.NewRequest("POST", githubAccessTokenURL, strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", config.AppConfig.CopilotAPIURL, strings.NewReader(data.Encode()))
 	if err != nil {
 		return "", err
 	}

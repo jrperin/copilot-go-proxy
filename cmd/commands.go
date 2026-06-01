@@ -34,6 +34,7 @@ func NewRootCmd() *cobra.Command {
 		newStatusCmd(),
 		newDiagnoseCmd(),
 		newConfigCmd(),
+		newModelsCmd(),
 	)
 
 	return root
@@ -144,6 +145,17 @@ func newStopCmd() *cobra.Command {
 		Short: "Stop the proxy server",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := process.StopDaemon(); err != nil {
+				// Try killing orphan processes
+				procs := process.FindRunningProxies()
+				if len(procs) > 0 {
+					for _, pid := range procs {
+						process.KillProcess(pid)
+						fmt.Printf("killed orphan process %d\n", pid)
+					}
+					process.RemovePID()
+					fmt.Println("copilot-proxy stopped")
+					return nil
+				}
 				return err
 			}
 			fmt.Println("copilot-proxy stopped")
@@ -175,7 +187,11 @@ func newStatusCmd() *cobra.Command {
 			status := process.GetStatus(Port)
 
 			if status.Running {
-				fmt.Printf("copilot-proxy: running (PID %d, port %d)\n", status.PID, status.Port)
+				if len(status.OrphanPIDs) > 0 {
+					fmt.Printf("copilot-proxy: running (PID %d, port %d) [orphan - no PID file]\n", status.PID, status.Port)
+				} else {
+					fmt.Printf("copilot-proxy: running (PID %d, port %d)\n", status.PID, status.Port)
+				}
 			} else {
 				fmt.Println("copilot-proxy: stopped")
 			}
@@ -192,28 +208,105 @@ func newStatusCmd() *cobra.Command {
 				fmt.Println("api: not responding")
 			}
 
+			if len(status.OrphanPIDs) > 0 {
+				fmt.Printf("\nWarning: orphan process(es) %v running without PID file\n", status.OrphanPIDs)
+				fmt.Println("  copilot-proxy stop    # kill orphan and clean up")
+				fmt.Println("  copilot-proxy restart # kill orphan and start fresh")
+			} else if !status.Running {
+				fmt.Println("\nNext steps:")
+				if !status.Authenticated {
+					fmt.Println("  1. copilot-proxy auth      # authenticate with GitHub")
+				}
+				fmt.Printf("  copilot-proxy start        # start on port %d\n", Port)
+				fmt.Println("  copilot-proxy diagnose     # full diagnostics")
+			}
+
 			return nil
 		},
 	}
 }
 
 func newDiagnoseCmd() *cobra.Command {
-	return &cobra.Command{
+	var jsonOutput bool
+
+	cmd := &cobra.Command{
 		Use:   "diagnose",
 		Short: "Run full diagnostics",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			diag := process.Diagnose(Port)
-			data, _ := json.MarshalIndent(diag, "", "  ")
-			fmt.Println(string(data))
+
+			if jsonOutput {
+				data, _ := json.MarshalIndent(diag, "", "  ")
+				fmt.Println(string(data))
+				return nil
+			}
+
+			fmt.Println("=== copilot-proxy diagnostics ===")
+			fmt.Println()
+
+			// Auth
+			if diag["authenticated"].(bool) {
+				fmt.Println("  auth:        ok")
+			} else {
+				fmt.Println("  auth:        NOT AUTHENTICATED")
+				fmt.Println("               run: copilot-proxy auth")
+			}
+
+			// PID / Process
+			procs, hasProcs := diag["running_processes"].([]int)
+			if diag["pid_file_exists"].(bool) {
+				pid := diag["pid"].(int)
+				if diag["process_alive"].(bool) {
+					fmt.Printf("  pid file:    ok (PID %d, alive)\n", pid)
+				} else {
+					fmt.Printf("  pid file:    STALE (PID %d, not running)\n", pid)
+					if !hasProcs || len(procs) == 0 {
+						fmt.Println("               run: copilot-proxy start")
+					}
+				}
+			} else {
+				fmt.Println("  pid file:    not found")
+				if !hasProcs || len(procs) == 0 {
+					fmt.Println("               run: copilot-proxy start")
+				} else {
+					fmt.Println("               orphan process(es) detected")
+				}
+			}
+
+			// Running processes
+			if hasProcs && len(procs) > 0 {
+				fmt.Printf("  processes:   %v (orphan)\n", procs)
+			}
+
+			// Port / API
+			port := diag["port"].(int)
+			if diag["api_healthy"].(bool) {
+				fmt.Printf("  port %d:     api healthy\n", port)
+			} else {
+				fmt.Printf("  port %d:     api not responding\n", port)
+			}
+
+			// Log tail
+			if logTail, ok := diag["log_tail"].(string); ok && logTail != "" {
+				fmt.Printf("\n--- last log lines (%s) ---\n", diag["log_path"])
+				fmt.Print(logTail)
+				fmt.Println("--- end ---")
+			} else if logPath, ok := diag["log_path"].(string); ok {
+				fmt.Printf("\n  log:         %s (empty or not found)\n", logPath)
+			}
+
 			return nil
 		},
 	}
+
+	cmd.Flags().BoolVar(&jsonOutput, "json", false, "Output as JSON")
+	return cmd
 }
 
 func newConfigCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "config",
-		Short: "Print provider config for opencode.json",
+		Short: "Print provider config for opencode-config.json",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			config := map[string]interface{}{
 				"npm":  "@ai-sdk/openai-compatible",
@@ -256,7 +349,7 @@ func newConfigCmd() *cobra.Command {
 
 			data, _ := json.MarshalIndent(config, "", "  ")
 			fmt.Println(string(data))
-			fmt.Println("\n# Add this to your opencode.json under \"provider\" -> \"copilot\"")
+			fmt.Println("\n# Add this to your opencode-config.json under \"provider\" -> \"copilot\"")
 			return nil
 		},
 	}

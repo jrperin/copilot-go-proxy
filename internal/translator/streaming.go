@@ -186,9 +186,9 @@ func (s *StreamState) makeMessageStart() SSEEvent {
 				"stop_reason":   nil,
 				"stop_sequence": nil,
 				"usage": map[string]interface{}{
-					"input_tokens":              s.InputTokens,
-					"output_tokens":             0,
-					"cache_read_input_tokens":   s.CachedTokens,
+					"input_tokens":            s.InputTokens,
+					"output_tokens":           0,
+					"cache_read_input_tokens": s.CachedTokens,
 				},
 			},
 		},
@@ -257,9 +257,9 @@ func (s *StreamState) makeMessageDelta(stopReason string) SSEEvent {
 				"stop_sequence": nil,
 			},
 			"usage": map[string]interface{}{
-				"input_tokens":              s.InputTokens,
-				"output_tokens":             s.OutputTokens,
-				"cache_read_input_tokens":   s.CachedTokens,
+				"input_tokens":            s.InputTokens,
+				"output_tokens":           s.OutputTokens,
+				"cache_read_input_tokens": s.CachedTokens,
 			},
 		},
 	}

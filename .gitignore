@@ -21,3 +21,7 @@ Thumbs.db
 
 # Copilot proxy data
 .copilot-proxy/
+
+# Environment configuration files
+.env
+auth.json

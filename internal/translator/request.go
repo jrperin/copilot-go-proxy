@@ -223,7 +223,7 @@ func translateToolChoice(tc interface{}) interface{} {
 		case "tool":
 			if name, ok := v["name"].(string); ok {
 				return map[string]interface{}{
-					"type": "function",
+					"type":     "function",
 					"function": map[string]string{"name": name},
 				}
 			}

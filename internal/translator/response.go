@@ -11,11 +11,11 @@ import (
 // TranslateToAnthropic converts an OpenAI response to Anthropic format
 func TranslateToAnthropic(resp OpenAIResponse) AnthropicResponse {
 	anthropic := AnthropicResponse{
-		ID:     resp.ID,
-		Type:   "message",
-		Role:   "assistant",
-		Model:  resp.Model,
-		Usage:  translateUsage(resp.Usage),
+		ID:    resp.ID,
+		Type:  "message",
+		Role:  "assistant",
+		Model: resp.Model,
+		Usage: translateUsage(resp.Usage),
 	}
 
 	if len(resp.Choices) == 0 {

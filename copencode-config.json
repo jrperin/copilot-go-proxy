@@ -1,0 +1,201 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "enabled_providers": [
+    "copilot"
+  ],
+  "model": "gpt-5.2",
+  "provider": {
+    "copilot": {
+      "models": {
+        "accounts/msft/routers/f185i3v4": {
+          "limit": {
+            "context": 256000,
+            "output": 1024
+          },
+          "name": "Search Agent A"
+        },
+        "accounts/msft/routers/fmfeto88": {
+          "limit": {
+            "context": 256000,
+            "output": 1024
+          },
+          "name": "Search Agent B"
+        },
+        "accounts/msft/routers/gdjv4v2v": {
+          "limit": {
+            "context": 256000,
+            "output": 1024
+          },
+          "name": "Search Agent C"
+        },
+        "claude-haiku-4.5": {
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          },
+          "name": "Claude Haiku 4.5"
+        },
+        "claude-sonnet-4.5": {
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          },
+          "name": "Claude Sonnet 4.5"
+        },
+        "claude-sonnet-4.6": {
+          "limit": {
+            "context": 200000,
+            "output": 32000
+          },
+          "name": "Claude Sonnet 4.6"
+        },
+        "gemini-2.5-pro": {
+          "limit": {
+            "context": 128000,
+            "output": 64000
+          },
+          "name": "Gemini 2.5 Pro"
+        },
+        "gemini-3-flash-preview": {
+          "limit": {
+            "context": 128000,
+            "output": 64000
+          },
+          "name": "Gemini 3 Flash (Preview)"
+        },
+        "gemini-3.1-pro-preview": {
+          "limit": {
+            "context": 128000,
+            "output": 64000
+          },
+          "name": "Gemini 3.1 Pro"
+        },
+        "gpt-3.5-turbo": {
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          },
+          "name": "GPT 3.5 Turbo"
+        },
+        "gpt-3.5-turbo-0613": {
+          "limit": {
+            "context": 16384,
+            "output": 4096
+          },
+          "name": "GPT 3.5 Turbo"
+        },
+        "gpt-4": {
+          "limit": {
+            "context": 32768,
+            "output": 4096
+          },
+          "name": "GPT 4"
+        },
+        "gpt-4-0125-preview": {
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "name": "GPT 4 Turbo"
+        },
+        "gpt-4-0613": {
+          "limit": {
+            "context": 32768,
+            "output": 4096
+          },
+          "name": "GPT 4"
+        },
+        "gpt-4-o-preview": {
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "name": "GPT-4o"
+        },
+        "gpt-4.1": {
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "name": "GPT-4.1"
+        },
+        "gpt-4.1-2025-04-14": {
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "name": "GPT-4.1"
+        },
+        "gpt-4o": {
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "name": "GPT-4o"
+        },
+        "gpt-4o-2024-05-13": {
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "name": "GPT-4o"
+        },
+        "gpt-4o-2024-08-06": {
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "name": "GPT-4o"
+        },
+        "gpt-4o-2024-11-20": {
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          },
+          "name": "GPT-4o"
+        },
+        "gpt-4o-mini": {
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "name": "GPT-4o mini"
+        },
+        "gpt-4o-mini-2024-07-18": {
+          "limit": {
+            "context": 128000,
+            "output": 4096
+          },
+          "name": "GPT-4o mini"
+        },
+        "gpt-5-mini": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          },
+          "name": "GPT-5 mini"
+        },
+        "gpt-5.2": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          },
+          "name": "GPT-5.2"
+        },
+        "oswe-vscode-prime": {
+          "limit": {
+            "context": 264000,
+            "output": 64000
+          },
+          "name": "Raptor mini (Preview)"
+        }
+      },
+      "name": "GitHub Copilot",
+      "npm": "@ai-sdk/openai-compatible",
+      "options": {
+        "apiKey": "sk-dummy",
+        "baseURL": "http://127.0.0.1:4141/v1"
+      }
+    }
+  }
+}

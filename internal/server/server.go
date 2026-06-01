@@ -27,6 +27,8 @@ func New(port int, client *copilot.Client) *Server {
 
 func (s *Server) registerRoutes() {
 	s.mux.HandleFunc("/v1/messages", s.handleMessages)
+	s.mux.HandleFunc("/v1/chat/completions", s.handleChatCompletions)
+	s.mux.HandleFunc("/chat/completions", s.handleChatCompletions)
 	s.mux.HandleFunc("/v1/models", s.handleModels)
 	s.mux.HandleFunc("/models", s.handleModels)
 	s.mux.HandleFunc("/health", s.handleHealth)

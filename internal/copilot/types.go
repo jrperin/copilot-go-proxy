@@ -21,9 +21,9 @@ type AccessTokenResponse struct {
 
 // Copilot token
 type CopilotToken struct {
-	Token     string    `json:"token"`
-	ExpiresAt int64     `json:"expires_at"`
-	RefreshIn int       `json:"refresh_in"`
+	Token     string `json:"token"`
+	ExpiresAt int64  `json:"expires_at"`
+	RefreshIn int    `json:"refresh_in"`
 }
 
 type CopilotTokenStore struct {
@@ -39,16 +39,16 @@ type ModelsResponse struct {
 }
 
 type Model struct {
-	ID           string         `json:"id"`
-	Name         string         `json:"name"`
-	Vendor       string         `json:"vendor"`
-	Capabilities ModelCaps      `json:"capabilities"`
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	Vendor       string    `json:"vendor"`
+	Capabilities ModelCaps `json:"capabilities"`
 }
 
 type ModelCaps struct {
-	Family   string       `json:"family"`
-	Type     string       `json:"type"`
-	Limits   ModelLimits  `json:"limits"`
+	Family   string        `json:"family"`
+	Type     string        `json:"type"`
+	Limits   ModelLimits   `json:"limits"`
 	Supports ModelSupports `json:"supports"`
 }
 

@@ -19,6 +19,7 @@ type StatusReport struct {
 	Authenticated bool   `json:"authenticated"`
 	APIHealthy    bool   `json:"api_healthy"`
 	LogPath       string `json:"log_path"`
+	OrphanPIDs    []int  `json:"orphan_pids,omitempty"`
 }
 
 func GetStatus(port int) StatusReport {
@@ -31,6 +32,14 @@ func GetStatus(port int) StatusReport {
 	if pid, err := LoadPID(); err == nil {
 		report.PID = pid
 		report.Running = IsProcessAlive(pid)
+	}
+
+	// Detect orphan processes (running but no PID file)
+	procs := FindRunningProxies()
+	if !report.Running && len(procs) > 0 {
+		report.OrphanPIDs = procs
+		report.Running = true
+		report.PID = procs[0]
 	}
 
 	if report.Running {
